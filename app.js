@@ -2,13 +2,7 @@ const form = document.getElementById("refuel-form");
 const tableBody = document.getElementById("records-table-body");
 const avgConsumptionEl = document.getElementById("avg-consumption");
 const totalFuelEl = document.getElementById("total-fuel");
-const dateDisplayInput = document.getElementById("date-display");
-const datePickerButton = document.getElementById("date-picker-btn");
-const datePickerMenu = document.getElementById("date-picker-menu");
-const calDay = document.getElementById("cal-day");
-const calMonth = document.getElementById("cal-month");
-const calYear = document.getElementById("cal-year");
-const calApply = document.getElementById("cal-apply");
+const dateNativeInput = document.getElementById("date-native");
 const odometerInput = document.getElementById("odometer");
 const litersInput = document.getElementById("liters");
 const priceInput = document.getElementById("price");
@@ -25,7 +19,7 @@ render();
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const dateIso = getMenuIsoDate();
+  const dateIso = dateNativeInput.value;
   const odometer = Number(odometerInput.value);
   const liters = Number(litersInput.value);
   const price = Number(priceInput.value);
@@ -73,106 +67,22 @@ tableBody.addEventListener("click", (event) => {
 });
 
 function setupDatePicker() {
-  initDateMenuOptions();
-  datePickerButton.addEventListener("click", toggleDatePicker);
-  dateDisplayInput.addEventListener("click", openDatePicker);
-  datePickerButton.addEventListener("keydown", handleDatePickerKeyboard);
-  dateDisplayInput.addEventListener("keydown", handleDatePickerKeyboard);
-  calMonth.addEventListener("change", syncDayOptionsForMenu);
-  calYear.addEventListener("change", syncDayOptionsForMenu);
-  calApply.addEventListener("click", applyDateFromMenu);
-  document.addEventListener("click", handleOutsideDateMenuClick);
-}
-
-function initDateMenuOptions() {
-  const currentYear = new Date().getFullYear();
-  const startYear = currentYear - 30;
-  const endYear = currentYear + 5;
-
-  for (let month = 1; month <= 12; month += 1) {
-    const monthValue = String(month).padStart(2, "0");
-    const option = new Option(monthValue, monthValue);
-    calMonth.add(option);
-  }
-
-  for (let year = endYear; year >= startYear; year -= 1) {
-    const option = new Option(String(year), String(year));
-    calYear.add(option);
-  }
-}
-
-function handleDatePickerKeyboard(event) {
-  if (event.key !== "Enter" && event.key !== " ") {
-    return;
-  }
-
-  event.preventDefault();
-  openDatePicker();
-}
-
-function toggleDatePicker() {
-  if (datePickerMenu.hidden) {
-    openDatePicker();
-  } else {
-    closeDatePicker();
-  }
+  dateNativeInput.addEventListener("click", openDatePicker);
 }
 
 function openDatePicker() {
-  datePickerMenu.hidden = false;
-}
-
-function closeDatePicker() {
-  datePickerMenu.hidden = true;
-}
-
-function handleOutsideDateMenuClick(event) {
-  const target = event.target;
-  if (!(target instanceof Node)) {
+  if (typeof dateNativeInput.showPicker === "function") {
+    dateNativeInput.showPicker();
     return;
   }
 
-  if (datePickerMenu.contains(target) || datePickerButton.contains(target) || dateDisplayInput.contains(target)) {
-    return;
-  }
-
-  closeDatePicker();
-}
-
-function syncDateDisplayFromMenu() {
-  dateDisplayInput.value = formatIsoDateRu(getMenuIsoDate());
-}
-
-function syncDayOptionsForMenu() {
-  const year = Number(calYear.value);
-  const month = Number(calMonth.value);
-  if (!year || !month) {
-    return;
-  }
-
-  const previousDay = calDay.value;
-  const daysInMonth = new Date(year, month, 0).getDate();
-  calDay.innerHTML = "";
-
-  for (let day = 1; day <= daysInMonth; day += 1) {
-    const dayValue = String(day).padStart(2, "0");
-    calDay.add(new Option(dayValue, dayValue));
-  }
-
-  calDay.value = Number(previousDay) <= daysInMonth ? previousDay : "01";
-}
-
-function applyDateFromMenu() {
-  syncDateDisplayFromMenu();
-  closeDatePicker();
+  dateNativeInput.focus();
+  dateNativeInput.click();
 }
 
 function applyFormDefaults() {
   const lastRecord = records[records.length - 1];
-  const todayIso = getTodayIso();
-
-  setMenuDate(todayIso);
-
+  dateNativeInput.value = getTodayIso();
   odometerInput.value = lastRecord ? String(lastRecord.odometer.toFixed(1)) : "";
   priceInput.value = lastRecord ? String(lastRecord.price.toFixed(2)) : "";
   fuelTypeInput.value = lastRecord?.fuelType || "АИ-95";
@@ -229,22 +139,17 @@ function render() {
 
   let totalDistance = 0;
   let totalFuelForConsumption = 0;
-  let lastFullIndex = null;
 
   const rows = records.map((record, index) => {
-    if (record.fullTank) {
-      if (lastFullIndex !== null) {
-        const previousFullRecord = records[lastFullIndex];
-        if (record.odometer > previousFullRecord.odometer) {
-          const distance = record.odometer - previousFullRecord.odometer;
-          const fuelUsed = records
-            .slice(lastFullIndex + 1, index + 1)
-            .reduce((sum, item) => sum + item.liters, 0);
-          totalDistance += distance;
-          totalFuelForConsumption += fuelUsed;
-        }
-      }
-      lastFullIndex = index;
+    const previousRecord = records[index - 1];
+    if (
+      previousRecord &&
+      previousRecord.fullTank &&
+      record.fullTank &&
+      record.odometer > previousRecord.odometer
+    ) {
+      totalDistance += record.odometer - previousRecord.odometer;
+      totalFuelForConsumption += record.liters;
     }
 
     const cost = record.liters * record.price;
@@ -291,30 +196,6 @@ function formatIsoDateRu(isoDate) {
   }
 
   return `${match[3]}.${match[2]}.${match[1]}`;
-}
-
-function setMenuDate(isoDate) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate || "");
-  if (!match) {
-    return;
-  }
-
-  calYear.value = match[1];
-  calMonth.value = match[2];
-  syncDayOptionsForMenu();
-  calDay.value = match[3];
-  syncDateDisplayFromMenu();
-}
-
-function getMenuIsoDate() {
-  const year = calYear.value;
-  const month = calMonth.value;
-  const day = calDay.value;
-  if (!year || !month || !day) {
-    return "";
-  }
-
-  return `${year}-${month}-${day}`;
 }
 
 function normalizeToIsoDate(value) {
