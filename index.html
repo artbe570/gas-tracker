@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Учет заправок</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Учет заправок</h1>
+      <p class="subtitle">Ведите историю заправок и рассчитывайте расход топлива.</p>
+
+      <section class="card">
+        <h2>Добавить запись о заправке</h2>
+        <form id="refuel-form" class="form-grid">
+          <label>
+            Дата заправки
+            <div class="date-picker-wrap">
+              <input type="date" id="date-native" class="date-input" required />
+            </div>
+          </label>
+
+          <label>
+            Пробег (км)
+            <input type="number" id="odometer" min="0" step="0.1" required />
+          </label>
+
+          <label>
+            Заправлено топлива (л)
+            <input type="number" id="liters" min="0.1" step="0.01" required />
+          </label>
+
+          <label>
+            Цена за литр (₽)
+            <input type="number" id="price" min="0" step="0.01" required />
+          </label>
+
+          <label>
+            Тип топлива
+            <select id="fuel-type" required>
+              <option value="АИ-80">АИ-80</option>
+              <option value="АИ-92">АИ-92</option>
+              <option value="АИ-95">АИ-95</option>
+              <option value="АИ-98">АИ-98</option>
+              <option value="АИ-100">АИ-100</option>
+              <option value="ДТ">ДТ</option>
+              <option value="ДТ зимнее">ДТ зимнее</option>
+              <option value="ДТ арктическое">ДТ арктическое</option>
+              <option value="LPG (пропан-бутан)">LPG (пропан-бутан)</option>
+              <option value="CNG (метан)">CNG (метан)</option>
+              <option value="Электро">Электро</option>
+            </select>
+          </label>
+
+          <label class="checkbox-field">
+            До полного бака
+            <span class="checkbox-row">
+              <input type="checkbox" id="full-tank" checked />
+              <span>Да</span>
+            </span>
+          </label>
+
+          <button type="submit" class="submit-btn">Сохранить запись</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Сводка по расходу</h2>
+        <div class="stats">
+          <p><strong>Средний расход:</strong> <span id="avg-consumption">-</span></p>
+          <p><strong>Всего топлива:</strong> <span id="total-fuel">0 л</span></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>История заправок</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Тип топлива</th>
+                <th>Пробег (км)</th>
+                <th>Топливо (л)</th>
+                <th>Цена/л (₽)</th>
+                <th>Стоимость (₽)</th>
+                <th>До полного</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="records-table-body">
+              <tr>
+                <td colspan="8" class="empty">Записей пока нет.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
