@@ -17,27 +17,7 @@
           <label>
             Дата заправки
             <div class="date-picker-wrap">
-              <input type="text" id="date-display" class="date-input" placeholder="дд.мм.гггг" readonly />
-              <button type="button" id="date-picker-btn" class="date-picker-btn" aria-label="Выбрать дату">
-                📅
-              </button>
-              <div id="date-picker-menu" class="date-picker-menu" hidden>
-                <div class="date-picker-grid">
-                  <label class="date-menu-field">
-                    День
-                    <select id="cal-day"></select>
-                  </label>
-                  <label class="date-menu-field">
-                    Месяц
-                    <select id="cal-month"></select>
-                  </label>
-                  <label class="date-menu-field">
-                    Год
-                    <select id="cal-year"></select>
-                  </label>
-                </div>
-                <button type="button" id="cal-apply" class="date-apply-btn">Применить</button>
-              </div>
+              <input type="date" id="date-native" class="date-input" required />
             </div>
           </label>
 
