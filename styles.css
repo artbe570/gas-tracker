@@ -120,9 +120,9 @@ select:focus-visible {
   direction: ltr;
   text-align: left;
   font-variant-numeric: tabular-nums;
-  cursor: pointer;
+  cursor: default;
   width: 100%;
-  padding-right: 42px;
+  padding-right: 12px;
   background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 }
 
@@ -179,35 +179,6 @@ select:focus-visible {
 
 .date-apply-btn:hover {
   background: linear-gradient(180deg, #6386ff 0%, var(--brand-strong) 100%);
-}
-
-.date-picker-btn {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: transparent;
-  color: #64708a;
-  font-size: 16px;
-  padding: 4px;
-  line-height: 1;
-  border-radius: 8px;
-  transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
-}
-
-.date-picker-btn:hover {
-  background: #edf2ff;
-  color: #42537a;
-}
-
-.date-picker-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px #cdd8f3;
-}
-
-.date-picker-btn:active {
-  transform: translateY(-50%) scale(0.96);
 }
 
 .submit-btn {
